@@ -8,6 +8,7 @@ import ConfirmModal from "../components/ConfirmModal";
 import FormModal from "../components/FormModal";
 import AddIcon from "@mui/icons-material/Add";
 
+//
 const HomePage = () => {
   const [cars, setCars] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
@@ -17,20 +18,25 @@ const HomePage = () => {
   const [selectedCar, setSelectedCar] = useState(null);
   const [mode, setMode] = useState("create");
 
+  // create a new car
   const handleClickNew = () => {
     setMode("create");
     setOpenForm(true);
   };
+
+  // update a car
   const handleClickEdit = (id) => {
     setMode("edit");
     setSelectedCar(cars.find((car) => car._id === id));
     setOpenForm(true);
   };
 
+  // delete a car
   const handleClickDelete = (id) => {
     setOpenConfirm(true);
     setSelectedCar(cars.find((car) => car._id === id));
   };
+
   const handleDelete = async () => {
     try {
       await apiService.delete(`/cars/${selectedCar._id}`);
@@ -39,12 +45,14 @@ const HomePage = () => {
       console.log(err);
     }
   };
+
   const name =
     selectedCar?.release_date +
     " " +
     selectedCar?.make +
     " " +
     selectedCar?.model;
+
   const columns = [
     { field: "name", headerName: "Name", flex: 3, minWidth: 120 },
     { field: "style", headerName: "Style", flex: 1, minWidth: 120 },
@@ -75,6 +83,7 @@ const HomePage = () => {
       ),
     },
   ];
+
   const rows = cars.map((car) => ({
     id: car._id,
     name: car.make + " " + car.model,
@@ -85,19 +94,18 @@ const HomePage = () => {
     release_date: car.release_date,
   }));
 
-  const getData =
-    useCallback(
-      async () => {
+  const getData = useCallback(async () => {
     const res = await apiService.get(`/cars?page=${page}`);
-    setCars(res.data.cars);
-    setTotalPages(res.data.total);
-      }
-      , [page]);
+    setCars(res.car);
+    setTotalPages(res.total);
+    console.log(res);
+  }, [page]);
 
   useEffect(() => {
     getData();
   }, [getData]);
 
+  //
   return (
     <Container maxWidth="lg" sx={{ pb: 3 }}>
       <ConfirmModal
@@ -122,6 +130,8 @@ const HomePage = () => {
         }}
         mode={mode}
       />
+
+      {/* data grid */}
       <div style={{ height: 630, width: "100%" }}>
         <DataGrid
           disableSelectionOnClick
@@ -141,6 +151,8 @@ const HomePage = () => {
           }}
         />
       </div>
+
+      {/* add a new car */}
       <Fab
         variant="extended"
         color="info"
@@ -154,4 +166,5 @@ const HomePage = () => {
     </Container>
   );
 };
+
 export default HomePage;
